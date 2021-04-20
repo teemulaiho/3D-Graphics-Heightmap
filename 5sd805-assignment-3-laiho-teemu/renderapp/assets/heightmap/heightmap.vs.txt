@@ -1,0 +1,26 @@
+// heightmap.vs.txt
+
+#version 330
+
+layout(location=0) in vec3 a_position;
+layout(location=1) in vec4 a_color;
+layout(location=2) in vec3 a_normal;
+
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform vec3 u_cameraposition;
+
+out vec4 f_color;	
+out vec3 f_normal;
+out vec3 f_view_vector;
+
+void main() {
+	//gl_Position = u_projection * u_view * u_world * vec4(a_position, 1);
+	gl_Position = u_projection * u_view * vec4(a_position, 1);
+	f_color = a_color;
+
+	// Phong shading
+	f_normal = normalize(a_normal);
+
+	f_view_vector = u_cameraposition - vec3(vec4(a_position, 1));
+}

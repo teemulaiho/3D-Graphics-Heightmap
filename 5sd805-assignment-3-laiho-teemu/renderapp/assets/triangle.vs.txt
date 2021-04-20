@@ -1,0 +1,33 @@
+// triangle.vs.txt
+
+#version 330
+
+layout(location=0) in vec3 a_position;
+layout(location=1) in vec2 a_texcoord;
+layout(location=2) in vec3 a_normal;
+
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform mat4 u_world;
+uniform vec3 u_cameraposition;
+
+out vec2 f_texcoord;
+out vec3 f_normal;
+out vec3 f_view_vector;
+
+void main() {
+	gl_Position = u_projection * u_view * u_world * vec4(a_position, 1);
+	f_texcoord = a_texcoord;
+	f_normal = a_normal;
+
+	mat4 M = u_world;
+
+	// inverse & transpose world matrix. SLOW MAYBE. DONT CALCULATE EACH VERTEX.
+	M = inverse(M);
+	M = transpose(M);
+
+	vec4 N = M * vec4(a_normal, 0);
+	f_normal = normalize(N.xyz);
+
+	f_view_vector = u_cameraposition - vec3(u_world * vec4(a_position, 1));
+}

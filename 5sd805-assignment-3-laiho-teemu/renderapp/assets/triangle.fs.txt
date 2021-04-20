@@ -1,0 +1,48 @@
+// triangle.fs.txt
+
+#version 330
+
+uniform sampler2D u_diffuse;
+
+// PHONG SHADING UNIFORMS BEGIN
+uniform vec3 light_direction;
+uniform vec3 light_ambient;
+uniform vec3 light_diffuse;
+uniform vec3 light_specular;
+
+uniform vec3 material_ambient;
+uniform vec3 material_diffuse;
+uniform vec3 material_specular;
+uniform float material_shininess;
+// PHONG SHADING UNIFORMS END
+
+in vec2 f_texcoord;
+in vec3 f_normal;
+in vec3 f_view_vector;
+
+out vec4 frag_color;
+
+void main() {
+	//frag_color = texture(u_diffuse, f_texcoord);
+
+
+	// PHONG SHADING CALCULATIONS BEGIN
+	vec3 N = normalize(f_normal);													// Surface normal.
+	vec3 L = normalize(-light_direction);											// - Light direction.
+	vec3 V = normalize(f_view_vector);												// View vector
+	vec3 R = normalize(-reflect(L, N));												// Light reflection.
+		
+	// ambient calculation
+	frag_color = vec4(material_ambient * light_ambient, 1);
+	
+	// diffuse calculation
+	frag_color = frag_color + vec4(material_diffuse * (max(dot(L, N), 0)) * light_diffuse, 1);
+
+	// specular calculation
+	frag_color = frag_color + vec4(material_specular * (pow(max(dot(R, V), 0), material_shininess) * light_specular), 1);
+
+	// texture
+	frag_color = texture(u_diffuse, f_texcoord) * frag_color;
+	//frag_color = vec4(N, 1);
+	// PHONG SHADING CALCULATIONS END
+}
